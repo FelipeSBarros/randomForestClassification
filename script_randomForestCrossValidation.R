@@ -19,32 +19,18 @@ names(img) <- paste0(rep('band', nlayers(img)), 1:nlayers(img))
 amostras <- read_sf("./Amostras/Amostras.shp")
 plot(amostras, add=T)
 
-# Amostras de treino de teste ----
-teste <- amostras %>% group_by(class) %>% sample_n(size = 3)
-treino <- amostras %>% filter(! id %in% (teste$id))
-nrow(treino)
-nrow(teste)
-
-# Extração de dados: ----
-valsTrain <- raster::extract(img, treino)
-valsTest <- raster::extract(img, teste)
-
+# Extração de dados:
+valsTrain <- raster::extract(img, amostras)
 head(valsTrain)
-head(valsTest)
 
-valsTrain <- data.frame(valsTrain, treino$class)
-valsTest <- data.frame(valsTest, teste$class)
+valsTrain <- data.frame(valsTrain, amostras$class)
 head(valsTrain)
-head(valsTest)
 names(valsTrain)[ncol(valsTrain)] <- "class"
-names(valsTest)[ncol(valsTest)] <- "class"
 
 valsTrain$class <- as.factor(valsTrain$class)
-valsTest$class <- as.factor(valsTest$class)
 class(valsTrain$class)
-
-# Criando modelo randomForest ----
-rf.mdl <- randomForest(valsTrain$class ~., data = valsTrain, xtest = subset(valsTest, select = -class), ytest = valsTest$class, keep.forest = TRUE)
+# Criando modelo randomForest
+rf.mdl <- randomForest(valsTrain$class ~., data = valsTrain)
 rf.mdl
 
 getTree(rf.mdl, k=1)
@@ -55,4 +41,4 @@ varImpPlot(rf.mdl)
 rf.class <- raster::predict(img, rf.mdl, progress = "text", type = "response")
 
 # Salvando classificação: ----
-writeRaster(rf.class, "rf_ClassificationCrossValidation.tif", overwrite = TRUE)
+writeRaster(rf.class, "rf_Classification.tif", overwrite = TRUE)
