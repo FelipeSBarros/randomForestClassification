@@ -19,7 +19,7 @@ names(img) <- paste0(rep('band', nlayers(img)), 1:nlayers(img))
 amostras <- read_sf("./Amostras/Amostras.shp")
 plot(amostras, add=T)
 
-# Extreção de dados:
+# Extração de dados:
 valsTrain <- raster::extract(img, amostras)
 head(valsTrain)
 
