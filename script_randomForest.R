@@ -19,7 +19,7 @@ names(img) <- paste0(rep('band', nlayers(img)), 1:nlayers(img))
 amostras <- read_sf("./Amostras/Amostras.shp")
 plot(amostras, add=T)
 
-# Extração de dados:
+# Extração de dados: ----
 valsTrain <- raster::extract(img, amostras)
 head(valsTrain)
 
@@ -29,7 +29,8 @@ names(valsTrain)[ncol(valsTrain)] <- "class"
 
 valsTrain$class <- as.factor(valsTrain$class)
 class(valsTrain$class)
-# Criando modelo randomForest
+
+# Criando modelo randomForest ----
 rf.mdl <- randomForest(valsTrain$class ~., data = valsTrain)
 rf.mdl
 
